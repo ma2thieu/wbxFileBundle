@@ -12,6 +12,24 @@ ENTITY :
  */
 private $image;
 
+/**
+ * Set image
+ *
+ * @param \wbx\FileBundle\Entity\File $image
+ */
+public function setImage(\wbx\CoreBundle\Entity\File $image) {
+    $this->image = $image;
+}
+
+/**
+ * Get image
+ *
+ * @return integer
+ */
+public function getImage() {
+    return $this->image;
+}
+
 
 --------------------
 FORM :
