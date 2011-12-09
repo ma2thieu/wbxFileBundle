@@ -1,6 +1,6 @@
 <?php
 
-namespace wbx\FileBundle;
+namespace wbx\Bundle\FileBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
