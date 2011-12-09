@@ -17,7 +17,7 @@ private $image;
  *
  * @param \wbx\FileBundle\Entity\File $image
  */
-public function setImage(\wbx\CoreBundle\Entity\File $image) {
+public function setImage(\wbx\FileBundle\Entity\File $image) {
     $this->image = $image;
 }
 
