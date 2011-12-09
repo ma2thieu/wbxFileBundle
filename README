@@ -1,0 +1,37 @@
+a Symfony2 Bundle to handle file upload
+
+--------------------
+ENTITY :
+--------------------
+
+/**
+ * @var \wbx\FileBundle\Entity\File $image
+ *
+ * @ORM\ManyToOne(targetEntity="\wbx\FileBundle\Entity\File", cascade={"all"})
+ * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+ */
+private $image;
+
+
+--------------------
+FORM :
+--------------------
+
+$builder
+    ->add('image', new \wbx\CoreBundle\Form\FileType())
+
+
+--------------------
+CONTROLLER :
+--------------------
+
+nothing to do
+
+
+--------------------
+VIEW :
+--------------------
+
+{{ form_label(form.image) }}
+{{ form_errors(form.image) }}
+{% include 'wbxFileBundle:File:embed_one.html.twig' with { 'form' : form.image, 'entity' : entity.image } %}

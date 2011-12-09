@@ -1,0 +1,20 @@
+{{ form_errors(form) }}
+
+{{ form_row(form.is_file_changed) }}
+
+<div>
+    {{ form_row(form.name) }}
+    {{ form_row(form.file) }}
+</div>
+<div style="padding-top:20px">
+    {% if entity %}
+        {% if entity.path %}
+            <a href="{{ entity.getWebPath() }}"><img src="{{ entity.getWebPath() | apply_filter('thumb_small_in') }}" /></a>
+            <br/>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="clear"></div>
+
+{{ form_rest(form) }}
