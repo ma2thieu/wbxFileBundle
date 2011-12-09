@@ -63,7 +63,7 @@ public function getImage() {
 >>> FORM :
 
 $builder
-    ->add('image', new \wbx\CoreBundle\Form\FileType())
+    ->add('image', new \wbx\FileBundle\Form\FileType())
 
 
 >>> CONTROLLER :
