@@ -1,4 +1,19 @@
+--------------------
+DESCRIPTION
+--------------------
+
 a Symfony2 Bundle to handle file upload
+
+
+--------------------
+INSTALL
+--------------------
+
+# /deps
+[wbxFileBundle]
+    git=http://github.com/ma2thieu/wbxFileBundle.git
+    target=bundles/wbx/FileBundle
+
 
 --------------------
 ENTITY :
