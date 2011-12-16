@@ -7,16 +7,14 @@
     {{ form_row(form.file) }}
 </div>
 <div style="padding-top:20px">
-    {% if entity is defined and entity is not null %}
-        {% if entity.path is defined and entity.path is not null %}
-            <a href="{{ entity.getWebPath() }}">
-                {% if imagine_filter is not defined or imagine_filter == "" %}
-                    {{ entity.path }}
-                {% else %}
-                    <img src="{{ entity.getWebPath() | apply_filter(imagine_filter) }}" />
-                {% endif %}
-            </a>
-        {% endif %}
+    {% if form.get('value').path is defined and form.get('value').path is not null %}
+        <a href="{{ form.get('value').getWebPath() }}">
+            {% if imagine_filter is not defined or imagine_filter == "" %}
+                {{ form.get('value').path }}
+            {% else %}
+                <img src="{{ form.get('value').getWebPath() | apply_filter(imagine_filter) }}" />
+            {% endif %}
+        </a>
     {% endif %}
 </div>
 
