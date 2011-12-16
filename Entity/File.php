@@ -37,6 +37,13 @@ class File {
     private $path;
 
     /**
+     * @var string $is_web_image
+     *
+     * @ORM\Column(name="is_web_image", type="boolean", nullable=true)
+     */
+    private $is_web_image;
+
+    /**
      * @var string $is_file_changed
      *
      * @ORM\Column(name="is_file_changed", type="boolean", nullable=true)
@@ -113,6 +120,24 @@ class File {
     }
 
     /**
+     * Set $is_web_image
+     *
+     * @param boolean $is_web_image
+     */
+    public function setIsWebImage($is_web_image) {
+        $this->is_web_image = $is_web_image;
+    }
+
+    /**
+     * Get $is_web_image
+     *
+     * @return boolean
+     */
+    public function getIsWebImage() {
+        return $this->is_web_image;
+    }
+
+    /**
      * Set $is_file_changed
      * needed to trigger the Lifecycle Callbacks when only $file is modified
      *
@@ -142,6 +167,7 @@ class File {
             $this->path = uniqid() . '.' . $this->file->guessExtension();
             $this->is_file_changed = false;
             $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
+            $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
         }
         else {
             $this->name = $this->name != "" ? $this->name : "untitled";

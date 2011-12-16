@@ -9,7 +9,7 @@
 <div style="padding-top:20px">
     {% if form.get('value').path is defined and form.get('value').path is not null %}
         <a href="{{ form.get('value').getWebPath() }}">
-            {% if imagine_filter is not defined or imagine_filter == "" %}
+            {% if imagine_filter is not defined or imagine_filter == "" or not form.get('value').getIsWebImage() %}
                 {{ form.get('value').path }}
             {% else %}
                 <img src="{{ form.get('value').getWebPath() | apply_filter(imagine_filter) }}" />
