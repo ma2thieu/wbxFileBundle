@@ -73,7 +73,7 @@ nothing to do
 
 >>> VIEW :
 
-{% include 'wbxFileBundle:File:embed_one.html.twig' with {
+{% include 'wbxFileBundle:File:embed.html.twig' with {
     'form'              : edit_form.image,
     'imagine_filter'    : "my_thumb_filter"
 } %}
