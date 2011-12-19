@@ -1,5 +1,8 @@
 {{ form_errors(form) }}
 
+{# TODO : create a custon filed type instead of overriding hidden_widget #}
+{% form_theme form 'wbxFileBundle:File:form.html.twig' %}
+
 {{ form_row(form.is_file_changed) }}
 
 <div>

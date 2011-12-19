@@ -1,0 +1,5 @@
+{% block hidden_widget %}
+{% spaceless %}
+    <input type="hidden" {{ block('widget_attributes') }} value="1" />
+{% endspaceless %}
+{% endblock hidden_widget %}
