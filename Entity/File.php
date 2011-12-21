@@ -56,6 +56,11 @@ class File {
     private $old_path;
 
     /**
+     * @var string $to_unlink
+     */
+    private $to_unlink;
+
+    /**
      * @var string $file
      * @Assert\File(maxSize="5000000")
      */
@@ -193,12 +198,21 @@ class File {
         }
     }
 
+
+    /**
+     * @ORM\PreRemove()
+     */
+    public function preRemoveUpload() {
+        // http://www.doctrine-project.org/jira/browse/DDC-1401
+        $this->to_unlink = $this->getAbsolutePath();
+    }
+
     /**
      * @ORM\PostRemove()
      */
-    public function removeUpload() {
-        if ($file = $this->getAbsolutePath()) {
-            unlink($file);
+    public function postRemoveUpload() {
+        if ($this->to_unlink) {
+            unlink($this->to_unlink);
         }
     }
 
