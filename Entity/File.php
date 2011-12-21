@@ -30,6 +30,13 @@ class File {
     private $name;
 
     /**
+     * @var string $extension
+     *
+     * @ORM\Column(name="extension", type="string", length=255)
+     */
+    private $extension;
+
+    /**
      * @var string $path
      *
      * @ORM\Column(name="path", type="string", length=255, nullable=true)
@@ -107,6 +114,24 @@ class File {
     }
 
     /**
+     * Set extension
+     *
+     * @param string $extension
+     */
+    public function setExtension($extension) {
+        $this->extension = $extension;
+    }
+
+    /**
+     * Get extension
+     *
+     * @return string
+     */
+    public function getExtension() {
+        return $this->extension;
+    }
+
+    /**
      * Set path
      *
      * @param string $path
@@ -169,7 +194,8 @@ class File {
     public function preUpload() {
         if ($this->file !== null) {
             $this->old_path = $this->path;
-            $this->path = uniqid() . '.' . $this->file->guessExtension();
+            $this->extension = $this->file->guessExtension();
+            $this->path = uniqid() . '.' . $this->extension;
             $this->is_file_changed = false;
             $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
             $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
@@ -216,6 +242,10 @@ class File {
         }
     }
 
+
+    public function getDownloadFilename() {
+        return $this->getName() . '.' . $this->getExtension();
+    }
 
     public function getAbsolutePath() {
         return $this->path === null ? null : $this->getUploadRootDir() . '/' . $this->path;

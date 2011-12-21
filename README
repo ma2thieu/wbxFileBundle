@@ -26,6 +26,11 @@ $loader->registerNamespaces(array(
     'wbx'               => __DIR__.'/../vendor/bundles',
 	...
 
+# app/config/routing.yml :
+wbxFileBundle_download:
+    pattern:  /wbxfile/download/{id}
+    defaults: { _controller: wbxFileBundle:File:download }
+
 
 --------------------
 EXEMPLE :

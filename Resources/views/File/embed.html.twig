@@ -11,9 +11,9 @@
 </div>
 <div style="padding-top:20px">
     {% if form.get('value').path is defined and form.get('value').path is not null %}
-        <a href="{{ form.get('value').getWebPath() }}">
+        <a href="{{ path('wbxFileBundle_download', { 'id': form.get('value').id }) }}">
             {% if imagine_filter is not defined or imagine_filter == "" or not form.get('value').getIsWebImage() %}
-                {{ form.get('value').path }}
+                download
             {% else %}
                 <img src="{{ form.get('value').getWebPath() | apply_filter(imagine_filter) }}" />
             {% endif %}
