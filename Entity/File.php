@@ -32,7 +32,7 @@ class File {
     /**
      * @var string $extension
      *
-     * @ORM\Column(name="extension", type="string", length=255)
+     * @ORM\Column(name="extension", type="string", length=255, nullable=true)
      */
     private $extension;
 
