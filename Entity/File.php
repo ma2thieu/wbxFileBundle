@@ -8,8 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * wbx\FileBundle\Entity\File
  *
- * @ORM\Table()
- * @ORM\Entity(repositoryClass="wbx\FileBundle\Entity\FileRepository")
+ * @Orm\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
  */
 class File {
