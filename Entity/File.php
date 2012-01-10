@@ -8,7 +8,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * wbx\FileBundle\Entity\File
  *
- * @Orm\MappedSuperclass
+ * @ORM\Table()
+ * @ORM\Entity(repositoryClass="wbx\FileBundle\Entity\FileRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class File {
@@ -36,18 +37,18 @@ class File {
     private $extension;
 
     /**
+     * @var string $mime_type
+     *
+     * @ORM\Column(name="mime_type", type="string", length=255, nullable=true)
+     */
+    private $mime_type;
+
+    /**
      * @var string $path
      *
      * @ORM\Column(name="path", type="string", length=255, nullable=true)
      */
     private $path;
-
-    /**
-     * @var string $is_web_image
-     *
-     * @ORM\Column(name="is_web_image", type="boolean", nullable=true)
-     */
-    private $is_web_image;
 
     /**
      * @var string $is_file_changed
@@ -68,7 +69,7 @@ class File {
 
     /**
      * @var string $file
-     * @Assert\File(maxSize="10000000")
+     * @Assert\File(maxSize="5000000")
      */
     public $file;
 
@@ -131,6 +132,24 @@ class File {
     }
 
     /**
+     * Set mime_type
+     *
+     * @param string $mime_type
+     */
+    public function setMimeType($mime_type) {
+        $this->mime_type = $mime_type;
+    }
+
+    /**
+     * Get mime_type
+     *
+     * @return string
+     */
+    public function getMimeType() {
+        return $this->mime_type;
+    }
+
+    /**
      * Set path
      *
      * @param string $path
@@ -149,21 +168,12 @@ class File {
     }
 
     /**
-     * Set $is_web_image
-     *
-     * @param boolean $is_web_image
-     */
-    public function setIsWebImage($is_web_image) {
-        $this->is_web_image = $is_web_image;
-    }
-
-    /**
      * Get $is_web_image
      *
      * @return boolean
      */
     public function getIsWebImage() {
-        return $this->is_web_image;
+        return in_array($this->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
     }
 
     /**
@@ -193,11 +203,16 @@ class File {
     public function preUpload() {
         if ($this->file !== null) {
             $this->old_path = $this->path;
-            $this->extension = $this->file->guessExtension();
-            $this->path = uniqid() . '.' . $this->extension;
-            $this->is_file_changed = false;
             $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
-            $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
+
+            $this->extension = $this->file->getExtension();
+            if (strlen($this->extension) == 0) {
+                $this->extension = substr($this->file->getClientOriginalName(), strrpos($this->file->getClientOriginalName(), '.') + 1);
+            }
+
+            $this->mime_type = $this->file->getMimeType();
+            $this->path = uniqid() . (strlen($this->extension) > 0 ? '.' . $this->extension : "");
+            $this->is_file_changed = false;
         }
         else {
             $this->name = $this->name != "" ? $this->name : "untitled";
@@ -243,7 +258,18 @@ class File {
 
 
     public function getDownloadFilename() {
-        return $this->getName() . '.' . $this->getExtension();
+        $ret = $this->getName();
+
+        $ext = "." . $this->getExtension();
+        $len = strlen($ext);
+
+        if ($len > 1) {
+            if (substr($this->getName(), -$len) != $ext) {
+                $ret .= $ext;
+            }
+        }
+
+        return $ret;
     }
 
     public function getAbsolutePath() {
