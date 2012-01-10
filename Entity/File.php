@@ -6,11 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * wbx\FileBundle\Entity\File
- *
- * @ORM\Table()
- * @ORM\Entity(repositoryClass="wbx\FileBundle\Entity\FileRepository")
- * @ORM\HasLifecycleCallbacks
+* wbx\FileBundle\Entity\File
+*
+* @Orm\MappedSuperclass
+* @ORM\HasLifecycleCallbacks
  */
 class File {
     /**
