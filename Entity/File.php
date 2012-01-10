@@ -68,7 +68,7 @@ class File {
 
     /**
      * @var string $file
-     * @Assert\File(maxSize="5000000")
+     * @Assert\File(maxSize="10000000")
      */
     public $file;
 
