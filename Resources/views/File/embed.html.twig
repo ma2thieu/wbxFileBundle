@@ -9,6 +9,7 @@
     {{ form_row(form.name) }}
     {{ form_row(form.file) }}
 </div>
+
 <div class="media" style="padding-top:20px">
     {% if form.get('value').path is defined and form.get('value').path is not null %}
         <a href="{{ path('wbxFileBundle_download', { 'id': form.get('value').id }) }}">
@@ -18,6 +19,8 @@
                 <img src="{{ form.get('value').getWebPath() | apply_filter(imagine_filter) }}" />
             {% endif %}
         </a>
+    {% elseif show_default_image is defined and show_default_image %}
+        <img src="{{ "/bundles/wbxfile/images/default.png" | apply_filter(imagine_filter) }}" />
     {% endif %}
 </div>
 
