@@ -235,11 +235,11 @@ class File {
     /**
      * @ORM\PostRemove()
      */
-    public function postRemoveUpload() {
-        if ($this->to_unlink) {
-            unlink($this->to_unlink);
-        }
-    }
+	public function postRemoveUpload() {
+	    if ($this->to_unlink && is_file($this->to_unlink)) {
+			unlink($this->to_unlink);
+	    }
+	}
 
 
     public function getDownloadFilename() {
