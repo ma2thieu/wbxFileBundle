@@ -28,7 +28,7 @@ $loader->registerNamespaces(array(
 
 # app/config/routing.yml :
 wbxFileBundle_download:
-    pattern:  /wbxfile/download/{id}
+    pattern:  /wbxfile/download/{class}/{id}
     defaults: { _controller: wbxFileBundle:File:download }
 
 
@@ -38,37 +38,35 @@ EXEMPLE :
 
 >>> ENTITY :
 
-/**
- * @var \wbx\FileBundle\Entity\File $image
- *
- * @ORM\ManyToOne(targetEntity="\wbx\FileBundle\Entity\File", cascade={"all"})
- * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
- */
-private $image;
+# /src/my/Bundle/Entity/File.php
+
+namespace my\Bundle\Entity;
+use wbx\FileBundle\Entity\File as wbxFile;
 
 /**
- * Set image
+ * wbx\CoreBundle\Entity\File
  *
- * @param \wbx\FileBundle\Entity\File $image
+ * @Orm\Entity()
+ * @ORM\Table()
  */
-public function setImage(\wbx\FileBundle\Entity\File $image) {
-    $this->image = $image;
+class File extends wbxFile {
+
 }
 
+# /src/my/Bundle/Entity/Object.php
 /**
- * Get image
+ * @var \my\Bundle\Entity\File $file
  *
- * @return integer
+ * @ORM\ManyToOne(targetEntity="\my\Bundle\Entity\File", cascade={"all"})
+ * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
  */
-public function getImage() {
-    return $this->image;
-}
+private $file;
 
 
 >>> FORM :
 
 $builder
-    ->add('image', new \wbx\FileBundle\Form\FileType())
+    ->add('file', new \wbx\FileBundle\Form\FileType())
 
 
 >>> CONTROLLER :
@@ -80,10 +78,12 @@ nothing to do
 
 {% include 'wbxFileBundle:File:embed.html.twig' with {
     'form'              : edit_form.image,
+	'class'             : "myBundle:File",
     'imagine_filter'    : "my_thumb_filter"
 } %}
 
 'form' is mandatory
+'class' is mandatory (used for the download link)
 'imagine_filter' is optional : if set the bundle AvalancheImagineBundle (https://github.com/avalanche123/AvalancheImagineBundle) is needed and the value of imagine_filter will be used as a the name of the Imagine filter to be called to create and display a thumbnail of the picture.
 If imagine_filter is not defined or == "" a link to the file will be displayed
 

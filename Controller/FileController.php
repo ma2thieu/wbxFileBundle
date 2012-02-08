@@ -7,9 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends Controller {
 
-    public function downloadAction($id) {
+    public function downloadAction($id, $class) {
         $em = $this->getDoctrine()->getEntityManager();
-        $file = $em->getRepository('wbxFileBundle:File')->find($id);
+        $file = $em->getRepository($class)->find($id);
 
         if (!$file) {
             throw $this->createNotFoundException("Unable to find File");
