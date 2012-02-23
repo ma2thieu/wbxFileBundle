@@ -84,12 +84,7 @@ nothing to do
 
 'form' is mandatory
 'class' is mandatory (used for the download link)
-'imagine_filter' is optional : if set the bundle AvalancheImagineBundle (https://github.com/avalanche123/AvalancheImagineBundle) is needed and the value of imagine_filter will be used as a the name of the Imagine filter to be called to create and display a thumbnail of the picture.
+'imagine_filter' is optional : if set the bundle LiipImagineBundle (http://github.com/liip/LiipImagineBundle) is needed and the value of imagine_filter will be used as a the name of the Imagine filter to be called to create and display a thumbnail of the picture.
 If imagine_filter is not defined or == "" a link to the file will be displayed
-
-
-
-
-
 
 

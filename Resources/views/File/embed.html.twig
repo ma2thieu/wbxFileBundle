@@ -16,11 +16,11 @@
             {% if imagine_filter is not defined or imagine_filter == "" or not form.get('value').getIsWebImage() %}
                 download
             {% else %}
-                <img src="{{ form.get('value').getWebPath() | apply_filter(imagine_filter) }}" />
+                <img src="{{ form.get('value').getWebPath() | imagine_filter(imagine_filter) }}" />
             {% endif %}
         </a>
     {% elseif show_default_image is defined and show_default_image %}
-        <img src="{{ "/bundles/wbxfile/images/default.png" | apply_filter(imagine_filter) }}" />
+        <img src="{{ "/bundles/wbxfile/images/default.png" | imagine_filter(imagine_filter) }}" />
     {% endif %}
 </div>
 
