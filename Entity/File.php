@@ -5,6 +5,9 @@ namespace wbx\FileBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\HttpFoundation\File\File AS SymfonyFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 /**
  * wbx\FileBundle\Entity\File
  *
@@ -67,7 +70,7 @@ class File {
     private $to_unlink;
 
     /**
-     * @var string $file
+     * @var \Symfony\Component\HttpFoundation\File\File $file
      * @Assert\File(maxSize="10000000")
      */
     public $file;
@@ -187,6 +190,23 @@ class File {
 
 
     /**
+     * @param \Symfony\Component\HttpFoundation\File\File $file
+     */
+    public function setFile(SymfonyFile $file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\File\File
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+
+    /**
      * @ORM\PrePersist()
      * @ORM\PreUpdate()
      */
@@ -196,8 +216,14 @@ class File {
             $this->extension = $this->file->guessExtension();
             $this->path = uniqid() . '.' . $this->extension;
             $this->is_file_changed = false;
-            $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
-            $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
+
+            if ($this->file instanceof UploadedFile) {
+                $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
+                $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
+            } else {
+                $this->name = $this->name != "" ? $this->name : $this->file->getFileName();
+                $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
+            }
         }
         else {
             $this->name = $this->name != "" ? $this->name : "untitled";
