@@ -67,7 +67,7 @@ class File {
     /**
      * @var string $to_unlink
      */
-    private $to_unlink;
+    protected $to_unlink;
 
     /**
      * @var \Symfony\Component\HttpFoundation\File\File $file
