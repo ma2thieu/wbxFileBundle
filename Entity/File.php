@@ -239,7 +239,7 @@ class File {
 
             // if old == new -> delete old because rename() doesn't seem to replace existing file
             // if old != new -> delete old because not needed anymore
-            if ($this->getOldAbsolutePath()) {
+            if ($this->getOldAbsolutePath() && is_file($this->getOldAbsolutePath())) {
                 unlink($this->getOldAbsolutePath());
             }
 
