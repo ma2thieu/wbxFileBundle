@@ -285,7 +285,7 @@ class File {
     }
 
     protected function getUploadRootDir() {
-        return __DIR__ . '/../../../../../../web/' . $this->getUploadDir();
+        return __DIR__ . '/../../../../../web/' . $this->getUploadDir();
     }
 
     protected function getUploadDir() {

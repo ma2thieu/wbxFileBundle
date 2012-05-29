@@ -18,7 +18,7 @@ class FileType extends AbstractType {
         return 'wbx_filebundle_filetype';
     }
 
-    public function getDefaultOptions() {
+	public function getDefaultOptions(array $options) {
         return array(
             'data_class' => 'wbx\FileBundle\Entity\File',
         );
