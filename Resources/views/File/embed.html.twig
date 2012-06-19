@@ -1,6 +1,6 @@
 {{ form_errors(form) }}
 
-{# TODO : create a custon filed type instead of overriding hidden_widget #}
+{# TODO : create a custom filed type instead of overriding hidden_widget #}
 {% form_theme form 'wbxFileBundle:File:form.html.twig' %}
 
 {{ form_row(form.is_file_changed) }}
@@ -25,5 +25,11 @@
 </div>
 
 <div class="clear"></div>
+    {% if form.to_empty is defined %}
+        {{ form_row(form.to_empty) }}
+    {% endif %}
+<div>
+
+</div>
 
 {{ form_rest(form) }}

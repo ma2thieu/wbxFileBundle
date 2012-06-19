@@ -75,6 +75,8 @@ class File {
      */
     public $file;
 
+    public $to_empty;
+
 
     /**
      *  Constructor
@@ -192,17 +194,24 @@ class File {
     /**
      * @param \Symfony\Component\HttpFoundation\File\File $file
      */
-    public function setFile(SymfonyFile $file)
-    {
+    public function setFile(SymfonyFile $file) {
         $this->file = $file;
     }
 
     /**
      * @return \Symfony\Component\HttpFoundation\File\File
      */
-    public function getFile()
-    {
+    public function getFile() {
         return $this->file;
+    }
+
+
+    public function getToEmpty() {
+        return $this->to_empty;
+    }
+
+    public function setToEmpty($to_empty) {
+        $this->to_empty = $to_empty;
     }
 
 
@@ -211,22 +220,33 @@ class File {
      * @ORM\PreUpdate()
      */
     public function preUpload() {
-        if ($this->file !== null) {
-            $this->old_path = $this->path;
-            $this->extension = $this->file->guessExtension();
-            $this->path = uniqid() . '.' . $this->extension;
-            $this->is_file_changed = false;
-
-            if ($this->file instanceof UploadedFile) {
-                $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
-                $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
-            } else {
-                $this->name = $this->name != "" ? $this->name : $this->file->getFileName();
-                $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
-            }
+        if ($this->to_empty) {
+            if (is_file($this->getAbsolutePath())) {
+       			unlink($this->getAbsolutePath());
+       	    }
+            $this->path = null;
+            $this->name = "untitled";
+            $this->is_web_image = null;
+            $this->is_file_changed = 1;
         }
         else {
-            $this->name = $this->name != "" ? $this->name : "untitled";
+            if ($this->file !== null) {
+                $this->old_path = $this->path;
+                $this->extension = $this->file->guessExtension();
+                $this->path = uniqid() . '.' . $this->extension;
+                $this->is_file_changed = false;
+
+                if ($this->file instanceof UploadedFile) {
+                    $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
+                    $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
+                } else {
+                    $this->name = $this->name != "" ? $this->name : $this->file->getFileName();
+                    $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
+                }
+            }
+            else {
+                $this->name = $this->name != "" ? $this->name : "untitled";
+            }
         }
     }
 
@@ -235,7 +255,7 @@ class File {
      * @ORM\PostUpdate()
      */
     public function upload() {
-        if ($this->file !== null) {
+        if (!$this->to_empty && $this->file !== null) {
 
             // if old == new -> delete old because rename() doesn't seem to replace existing file
             // if old != new -> delete old because not needed anymore
@@ -291,4 +311,6 @@ class File {
     protected function getUploadDir() {
         return 'uploads';
     }
+
+
 }
