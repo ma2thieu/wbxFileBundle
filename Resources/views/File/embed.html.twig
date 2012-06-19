@@ -26,4 +26,10 @@
 
 <div class="clear"></div>
 
+<div>
+    {% if form.to_empty is defined %}
+        {{ form_row(form.to_empty) }}
+    {% endif %}
+</div>
+
 {{ form_rest(form) }}
