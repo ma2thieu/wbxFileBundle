@@ -5,14 +5,35 @@ DESCRIPTION
 a Symfony2 Bundle to handle file upload
 
 
---------------------
-INSTALL
---------------------
+-----------------------
+INSTALL (with composer)
+-----------------------
+
+"require": {
+	"wbx/file-bundle": "*"
+}
+
+
+-------------------------------
+INSTALL (with deps the old way)
+-------------------------------
 
 # /deps
 [wbxFileBundle]
     git=http://github.com/ma2thieu/wbxFileBundle.git
     target=bundles/wbx/FileBundle
+
+
+# app/autoload.php
+$loader->registerNamespaces(array(
+	...
+    'wbx'               => __DIR__.'/../vendor/bundles',
+	...
+
+
+--------------------
+CONFIGURE
+--------------------
 
 # /app/AppKernel.php
 $bundles = array(
@@ -20,11 +41,6 @@ $bundles = array(
 	new wbx\FileBundle\wbxFileBundle(),
 	...
 
-# app/autoload.php
-$loader->registerNamespaces(array(
-	...
-    'wbx'               => __DIR__.'/../vendor/bundles',
-	...
 
 # app/config/routing.yml :
 wbxFileBundle_download:
