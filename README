@@ -31,6 +31,16 @@ wbxFileBundle_download:
     pattern:  /wbxfile/download/{class}/{id}
     defaults: { _controller: wbxFileBundle:File:download }
 
+# app/config/config.yml
+You may also need to register the wbxFileBundle as a doctrine entity manager, by adding the wbxFileBundle line in your config.yml:
+doctrine:
+    entity_managers:
+        default:
+            mappings:
+                wbxFileBundle:
+
+This is not necessary if you have auto-mapping.
+
 
 --------------------
 EXEMPLE :
