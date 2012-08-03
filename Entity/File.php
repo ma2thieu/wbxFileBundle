@@ -71,7 +71,6 @@ class File {
 
     /**
      * @var \Symfony\Component\HttpFoundation\File\File $file
-     * @Assert\File(maxSize="10000000")
      */
     public $file;
 
