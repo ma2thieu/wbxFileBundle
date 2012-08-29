@@ -237,7 +237,7 @@ class File {
                 if ($this->file instanceof UploadedFile) {
                     $filename = $this->file->getClientOriginalName();
                     $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
-                }
+                } 
 				else {
                     $filename = $this->file->getFileName();
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
@@ -246,15 +246,14 @@ class File {
                 $filename_a = explode(".", $filename);
                 if (count($filename_a) > 1) {
                     $extension = array_pop($filename_a);
-                    $name = implode(".", $filename_a);
                 }
                 else {
                     $extension = "dat";
-                    $name = $filename_a[0];
+                    $filename .= "." . $extension;
                 }
 
                 $this->extension = $extension;
-                $this->name = $this->name != "" ? $this->name : $name;
+                $this->name = $this->name != "" ? $this->name : $filename;
 
                 $this->path = uniqid() . '.' . $this->extension;
             }
@@ -303,7 +302,7 @@ class File {
 
 
     public function getDownloadFilename() {
-        return $this->getName() . '.' . $this->getExtension();
+        return $this->getName();
     }
 
     public function getAbsolutePath() {
