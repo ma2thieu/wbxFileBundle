@@ -232,7 +232,7 @@ class File {
         else {
             if ($this->file !== null) {
                 $this->old_path = $this->path;
-                $this->extension = $this->file->guessExtension();
+                $this->extension = $this->file->getExtension();
                 $this->path = uniqid() . '.' . $this->extension;
                 $this->is_file_changed = false;
 
