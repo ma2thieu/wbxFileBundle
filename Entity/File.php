@@ -232,18 +232,31 @@ class File {
         else {
             if ($this->file !== null) {
                 $this->old_path = $this->path;
-                $this->extension = $this->file->getExtension();
-                $this->path = uniqid() . '.' . $this->extension;
                 $this->is_file_changed = false;
 
                 if ($this->file instanceof UploadedFile) {
-                    $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
+                    $filename = $this->file->getClientOriginalName();
                     $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
                 } 
 				else {
-                    $this->name = $this->name != "" ? $this->name : $this->file->getFileName();
+                    $filename = $this->file->getFileName();
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
                 }
+
+                $filename_a = explode(".", $filename);
+                if (count($filename_a) > 1) {
+                    $extension = array_pop($filename_a);
+                    $name = implode(".", $filename_a);
+                }
+                else {
+                    $extension = "dat";
+                    $name = $filename_a[0];
+                }
+
+                $this->extension = $extension;
+                $this->name = $this->name != "" ? $this->name : $name;
+
+                $this->path = uniqid() . '.' . $this->extension;
             }
             else {
                 $this->name = $this->name != "" ? $this->name : "untitled";
