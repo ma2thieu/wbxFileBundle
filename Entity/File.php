@@ -75,7 +75,7 @@ class File {
      */
     public $file;
 
-    public $to_empty;
+	public $to_empty;
 
 
     /**
@@ -206,24 +206,24 @@ class File {
     }
 
 
-    public function getToEmpty() {
-        return $this->to_empty;
-    }
-
-    public function setToEmpty($to_empty) {
-        $this->to_empty = $to_empty;
-    }
+	public function getToEmpty() {
+	    return $this->to_empty;
+	}
+    
+	public function setToEmpty($to_empty) {
+	    $this->to_empty = $to_empty;
+	}
 
 
     /**
      * @ORM\PrePersist()
      * @ORM\PreUpdate()
      */
-    public function preUpload() {
+	public function preUpload() {
         if ($this->to_empty) {
             if (is_file($this->getAbsolutePath())) {
-       			unlink($this->getAbsolutePath());
-       	    }
+        		unlink($this->getAbsolutePath());
+        	}
             $this->path = null;
             $this->name = "untitled";
             $this->is_web_image = null;
@@ -232,17 +232,30 @@ class File {
         else {
             if ($this->file !== null) {
                 $this->old_path = $this->path;
-                $this->extension = $this->file->getExtension();
-                $this->path = uniqid() . '.' . $this->extension;
                 $this->is_file_changed = false;
 
                 if ($this->file instanceof UploadedFile) {
-                    $this->name = $this->name != "" ? $this->name : $this->file->getClientOriginalName();
+                    $filename = $this->file->getClientOriginalName();
                     $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
-                } else {
-                    $this->name = $this->name != "" ? $this->name : $this->file->getFileName();
+                } 
+				else {
+                    $filename = $this->file->getFileName();
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
                 }
+
+                $filename_a = explode(".", $filename);
+                if (count($filename_a) > 1) {
+                    $extension = array_pop($filename_a);
+                }
+                else {
+                    $extension = "dat";
+                    $filename .= "." . $extension;
+                }
+
+                $this->extension = $extension;
+                $this->name = $this->name != "" ? $this->name : $filename;
+
+                $this->path = uniqid() . '.' . $this->extension;
             }
             else {
                 $this->name = $this->name != "" ? $this->name : "untitled";
@@ -289,7 +302,7 @@ class File {
 
 
     public function getDownloadFilename() {
-        return $this->getName() . '.' . $this->getExtension();
+        return $this->getName();
     }
 
     public function getAbsolutePath() {
@@ -305,12 +318,10 @@ class File {
     }
 
     protected function getUploadRootDir() {
-        return __DIR__ . '/../../../../../../web/' . $this->getUploadDir();
+        return __DIR__ . '/../../../../../web/' . $this->getUploadDir();
     }
 
     protected function getUploadDir() {
         return 'uploads';
     }
-
-
 }
