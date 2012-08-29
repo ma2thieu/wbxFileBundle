@@ -237,7 +237,7 @@ class File {
                 if ($this->file instanceof UploadedFile) {
                     $filename = $this->file->getClientOriginalName();
                     $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
-                } 
+                }
 				else {
                     $filename = $this->file->getFileName();
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
