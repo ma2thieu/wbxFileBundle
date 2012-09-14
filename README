@@ -17,10 +17,10 @@ This can be done in two different ways:
     "require": {
         "wbx/file-bundle": "*"
     }
-
-
+    
+    
 **Method #2**) Use deps file
-
+	
 	[wbxFileBundle]
 		git=http://github.com/ma2thieu/wbxFileBundle.git
 		target=bundles/wbx/FileBundle
@@ -94,7 +94,7 @@ Entity
 	 * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
 	 */
 	private $file;
-
+	
 
 Form
 ----
