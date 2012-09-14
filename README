@@ -9,6 +9,8 @@ a Symfony2 Bundle to handle file upload
 INSTALL
 --------------------
 
+Requirement : IgorwFileServeBundle is required : https://github.com/igorw/IgorwFileServeBundle
+
 # /deps
 [wbxFileBundle]
     git=http://github.com/ma2thieu/wbxFileBundle.git

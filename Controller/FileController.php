@@ -15,12 +15,12 @@ class FileController extends Controller {
             throw $this->createNotFoundException("Unable to find File");
         }
 
-        $response = new Response();
-        $response->headers->set('Cache-Control', 'public');
-        $response->headers->set('Content-Type', 'application/force-download');
-        $response->headers->set('Content-Disposition', sprintf('attachment;filename="%s"', $file->getDownloadFilename()));
-        $response->headers->set('Content-Length', filesize($file->getAbsolutePath()));
-        $response->setContent(file_get_contents($file->getAbsolutePath()));
+        $path = '../web/' . $file->getWebPath();
+        $options = array(
+            'serve_filename' => $file->getDownloadFilename()
+        );
+
+        $response = $this->get('igorw_file_serve.response_factory')->create($path, 'application/octet-stream', $options);
 
         return $response;
     }
