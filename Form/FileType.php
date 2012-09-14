@@ -17,7 +17,7 @@ class FileType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
             ->add('name', 'text', array('required' => false))
-            ->add('file')
+            ->add('file', 'file')
             ->add('is_file_changed', 'hidden');
 
         if ($this->with_empty) {
