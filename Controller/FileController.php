@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends Controller {
 
-    public function downloadAction($id, $class) {
+    public function downloadAction($id, $class, $filename) {
         $em = $this->getDoctrine()->getEntityManager();
         $file = $em->getRepository($class)->find($id);
 
