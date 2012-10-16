@@ -60,7 +60,7 @@ Configuration
 
 	# app/config/routing.yml :
 	wbxFileBundle_download:
-		pattern:  /wbxfile/download/{class}/{id}/{filename}
+		pattern:  /wbxfile/download/{class}/{id}
 		defaults: { _controller: wbxFileBundle:File:download }
 
 
