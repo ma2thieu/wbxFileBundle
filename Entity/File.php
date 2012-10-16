@@ -242,16 +242,11 @@ class File {
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
                 }
 
-                $filename_a = explode(".", $filename);
-                if (count($filename_a) > 1) {
-                    $extension = array_pop($filename_a);
-                }
-                else {
-                    $extension = "dat";
-                    $filename .= "." . $extension;
+                $this->extension = $this->extractFilenameExtension($filename);
+                if ($this->extension == "") {
+                    $this->extension = "dat";
                 }
 
-                $this->extension = $extension;
                 $this->name = $this->name != "" ? $this->name : $filename;
 
                 $this->path = uniqid() . '.' . $this->extension;
@@ -316,6 +311,7 @@ class File {
         return $this->path === null ? '/bundles/wbxfile/images/default.png' : '/' . $this->getUploadDir() . '/' . $this->path;
     }
 
+
     protected function getUploadRootDir() {
         return __DIR__ . '/../../../../../web/' . $this->getUploadDir();
     }
@@ -323,4 +319,16 @@ class File {
     protected function getUploadDir() {
         return 'uploads';
     }
+
+    protected function extractFilenameExtension($filename) {
+        $extension = "";
+
+        $filename_a = explode(".", $filename);
+        if (count($filename_a) > 1) {
+            $extension = array_pop($filename_a);
+        }
+
+        return $extension;
+    }
+
 }
