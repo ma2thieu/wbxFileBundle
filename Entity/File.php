@@ -296,7 +296,13 @@ class File {
 
 
     public function getDownloadFilename() {
-        return $this->getName();
+        $n = $this->getName();
+
+        if ($this->extractFilenameExtension($n) == "") {
+            $n .= '.' . $this->extension;
+        }
+
+        return $n;
     }
 
     public function getAbsolutePath() {
