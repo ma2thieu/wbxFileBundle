@@ -219,6 +219,8 @@ class File {
      * @ORM\PreUpdate()
      */
 	public function preUpload() {
+        $this->is_file_changed = !$this->is_file_changed;
+
         if ($this->to_empty) {
             if (is_file($this->getAbsolutePath())) {
         		unlink($this->getAbsolutePath());
@@ -226,12 +228,10 @@ class File {
             $this->path = null;
             $this->name = "untitled";
             $this->is_web_image = null;
-            $this->is_file_changed = 1;
         }
         else {
             if ($this->file !== null) {
                 $this->old_path = $this->path;
-                $this->is_file_changed = false;
 
                 if ($this->file instanceof UploadedFile) {
                     $filename = $this->file->getClientOriginalName();
@@ -319,7 +319,7 @@ class File {
 
 
     protected function getUploadRootDir() {
-        return __DIR__ . '/../../../../../web/' . $this->getUploadDir();
+        return __DIR__ . '/../../../../../../web/' . $this->getUploadDir();
     }
 
     protected function getUploadDir() {
