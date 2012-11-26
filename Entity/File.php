@@ -219,8 +219,6 @@ class File {
      * @ORM\PreUpdate()
      */
 	public function preUpload() {
-        $this->is_file_changed = !$this->is_file_changed;
-
         if ($this->to_empty) {
             if (is_file($this->getAbsolutePath())) {
         		unlink($this->getAbsolutePath());
@@ -231,6 +229,8 @@ class File {
         }
         else {
             if ($this->file !== null) {
+                $this->is_file_changed = !$this->is_file_changed;
+
                 $this->old_path = $this->path;
 
                 if ($this->file instanceof UploadedFile) {
