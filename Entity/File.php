@@ -226,12 +226,12 @@ class File {
             $this->path = null;
             $this->name = "untitled";
             $this->is_web_image = null;
-            $this->is_file_changed = 1;
         }
         else {
             if ($this->file !== null) {
+                $this->is_file_changed = !$this->is_file_changed;
+
                 $this->old_path = $this->path;
-                $this->is_file_changed = false;
 
                 if ($this->file instanceof UploadedFile) {
                     $filename = $this->file->getClientOriginalName();
