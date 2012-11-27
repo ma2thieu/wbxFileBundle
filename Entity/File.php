@@ -46,6 +46,13 @@ class File {
     private $path;
 
     /**
+     * @var string $preview_path
+     *
+     * @ORM\Column(name="preview_path", type="string", length=255, nullable=true)
+     */
+    private $preview_path;
+
+    /**
      * @var string $is_web_image
      *
      * @ORM\Column(name="is_web_image", type="boolean", nullable=true)
@@ -65,16 +72,34 @@ class File {
     private $old_path;
 
     /**
+     * @var string $old_preview_path
+     */
+    private $old_preview_path;
+
+    /**
      * @var string $to_unlink
      */
     protected $to_unlink;
+
+    /**
+     * @var string $to_unlink_preview
+     */
+    protected $to_unlink_preview;
 
     /**
      * @var \Symfony\Component\HttpFoundation\File\File $file
      */
     public $file;
 
+    /**
+     * @var string $to_empty
+     */
 	public $to_empty;
+
+    /**
+     * @var string $preview_format
+     */
+    public $preview_format = "jpg";
 
 
     /**
@@ -153,6 +178,24 @@ class File {
     }
 
     /**
+     * Set preview_path
+     *
+     * @param string $preview_path
+     */
+    public function setPreviewPath($preview_path) {
+        $this->preview_path = $preview_path;
+    }
+
+    /**
+     * Get preview_path
+     *
+     * @return string
+     */
+    public function getPreviewPath() {
+        return $this->preview_path;
+    }
+
+    /**
      * Set $is_web_image
      *
      * @param boolean $is_web_image
@@ -205,38 +248,36 @@ class File {
     }
 
 
-	public function getToEmpty() {
-	    return $this->to_empty;
-	}
-    
-	public function setToEmpty($to_empty) {
-	    $this->to_empty = $to_empty;
-	}
-
 
     /**
      * @ORM\PrePersist()
      * @ORM\PreUpdate()
      */
 	public function preUpload() {
+        $this->is_file_changed = !$this->is_file_changed;
+
         if ($this->to_empty) {
             if (is_file($this->getAbsolutePath())) {
         		unlink($this->getAbsolutePath());
         	}
+
+            if (is_file($this->getAbsolutePreviewPath())) {
+        		unlink($this->getAbsolutePreviewPath());
+        	}
+
             $this->path = null;
+            $this->preview_path = null;
             $this->name = "untitled";
             $this->is_web_image = null;
         }
         else {
             if ($this->file !== null) {
-                $this->is_file_changed = !$this->is_file_changed;
-
                 $this->old_path = $this->path;
 
                 if ($this->file instanceof UploadedFile) {
                     $filename = $this->file->getClientOriginalName();
                     $this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
-                } 
+                }
 				else {
                     $filename = $this->file->getFileName();
                     $this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
@@ -250,6 +291,15 @@ class File {
                 $this->name = $this->name != "" ? $this->name : $filename;
 
                 $this->path = uniqid() . '.' . $this->extension;
+
+                $this->preview_path = null;
+
+                if ($this->extension == "pdf") {
+                    if (extension_loaded('Imagick')) {
+                        $this->preview_path = $this->path . '.' . $this->preview_format;
+                    }
+                }
+
             }
             else {
                 $this->name = $this->name != "" ? $this->name : "untitled";
@@ -270,7 +320,29 @@ class File {
                 unlink($this->getOldAbsolutePath());
             }
 
+            if ($this->getOldAbsolutePreviewPath() && is_file($this->getOldAbsolutePreviewPath())) {
+                unlink($this->getOldAbsolutePreviewPath());
+            }
+
             $this->file->move($this->getUploadRootDir(), $this->path);
+
+
+            if ($this->extension == "pdf") {
+                if (extension_loaded('Imagick')) {
+                    $img = new \Imagick();
+                    $img->setResolution(3*72, 3*72);
+                    $img->readImage($this->getAbsolutePath() . '[0]');
+
+                    $img->resampleImage(72, 72, \imagick::FILTER_GAUSSIAN, 1);
+                    $img->setImageResolution(72, 72);
+
+                    $img->setImageFormat($this->preview_format);
+                    $img->setCompressionQuality(90);
+                    $img->writeImages($this->getAbsolutePreviewPath(), true);
+                    $img->clear();
+                }
+            }
+
 
             unset($this->file);
         }
@@ -283,6 +355,7 @@ class File {
     public function preRemoveUpload() {
         // http://www.doctrine-project.org/jira/browse/DDC-1401
         $this->to_unlink = $this->getAbsolutePath();
+        $this->to_unlink_preview = $this->getAbsolutePreviewPath();
     }
 
     /**
@@ -292,6 +365,10 @@ class File {
 	    if ($this->to_unlink && is_file($this->to_unlink)) {
 			unlink($this->to_unlink);
 	    }
+
+        if ($this->to_unlink_preview && is_file($this->to_unlink_preview)) {
+   			unlink($this->to_unlink_preview);
+   	    }
 	}
 
 
@@ -309,12 +386,31 @@ class File {
         return $this->path === null ? null : $this->getUploadRootDir() . '/' . $this->path;
     }
 
+    public function getAbsolutePreviewPath() {
+        return $this->preview_path === null ? null : $this->getUploadRootDir() . '/' . $this->preview_path;
+    }
+
     public function getOldAbsolutePath() {
         return $this->old_path === null ? null : $this->getUploadRootDir() . '/' . $this->old_path;
     }
 
+    public function getOldAbsolutePreviewPath() {
+        return $this->old_preview_path === null ? null : $this->getUploadRootDir() . '/' . $this->old_preview_path;
+    }
+
     public function getWebPath() {
-        return $this->path === null ? '/bundles/wbxfile/images/default.png' : '/' . $this->getUploadDir() . '/' . $this->path;
+        if ($this->path === null) {
+            return '/bundles/wbxfile/images/default.png';
+        }
+        else if ($this->is_web_image) {
+            return '/' . $this->getUploadDir() . '/' . $this->path;
+        }
+        else if ($this->preview_path !== null) {
+            return '/' . $this->getUploadDir() . '/' . $this->preview_path;
+        }
+        else {
+            return '/bundles/wbxfile/images/default.png';
+        }
     }
 
 

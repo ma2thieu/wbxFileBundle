@@ -104,6 +104,7 @@ Form
 
 * Pass `true` or `false` to `FileType` constructor to display or not the "empty" checkbox to remove the uploaded file
 
+* If the php imagick extension is available it is used to create a png preview of uploaded pdf files. $file->getWebPath() will automatically return the preview file.
 
 View
 ----
