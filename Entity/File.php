@@ -331,15 +331,28 @@ class File {
                 if (extension_loaded('Imagick')) {
                     $img = new \Imagick();
                     $img->setResolution(3*72, 3*72);
+
                     $img->readImage($this->getAbsolutePath() . '[0]');
+                    $img->setbackgroundcolor("#ff0000");
 
                     $img->resampleImage(72, 72, \imagick::FILTER_GAUSSIAN, 1);
                     $img->setImageResolution(72, 72);
 
-                    $img->setImageFormat($this->preview_format);
-                    $img->setCompressionQuality(90);
-                    $img->writeImages($this->getAbsolutePreviewPath(), true);
+                    $img_flat = new \IMagick();
+                    $img_flat->newImage($img->getImageWidth(), $img->getImageHeight(), new \ImagickPixel("white"));
+
+                    $img_flat->compositeImage($img, \imagick::COMPOSITE_OVER, 0, 0);
+
+                    $img_flat->setImageFormat($this->preview_format);
+                    $img_flat->writeImage('image.jpg');
+                    $img_flat->setCompressionQuality(90);
+                    $img_flat->writeImages($this->getAbsolutePreviewPath(), true);
+
                     $img->clear();
+                    $img->destroy();
+
+                    $img_flat->clear();
+                    $img_flat->destroy();
                 }
             }
 
