@@ -15,7 +15,7 @@ class FileController extends Controller {
             throw $this->createNotFoundException("Unable to find File");
         }
 
-        $path = '../web/' . $file->getWebPath();
+        $path = '../web/' . $file->getDownloadPath();
         $options = array(
             'serve_filename' => $file->getDownloadFilename()
         );

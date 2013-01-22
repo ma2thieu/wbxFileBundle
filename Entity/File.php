@@ -426,6 +426,15 @@ class File {
         }
     }
 
+    public function getDownloadPath() {
+        if ($this->path === null) {
+            return '/bundles/wbxfile/images/default.png';
+        }
+        else {
+            return '/' . $this->getUploadDir() . '/' . $this->path;
+        }
+    }
+
 
     protected function getUploadRootDir() {
         return __DIR__ . '/../../../../../../web/' . $this->getUploadDir();
