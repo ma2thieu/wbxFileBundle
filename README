@@ -94,7 +94,11 @@ Entity
 	 * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
 	 */
 	private $file;
-	
+
+
+	$mask_path can be used to point to a bitmap file that will be used as a mask.
+	the image will be resized and cropped to the mask dimensions
+	(only work with imagick extension)
 
 Form
 ----

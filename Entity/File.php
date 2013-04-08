@@ -67,6 +67,13 @@ class File {
     private $is_file_changed;
 
     /**
+     * @var string $mask_path
+     *
+     * @ORM\Column(name="mask_path", type="string", length=255, nullable=true)
+     */
+    private $mask_path;
+
+    /**
      * @var string $old_path
      */
     private $old_path;
@@ -107,6 +114,7 @@ class File {
      */
     public function __construct() {
         $this->uniq = uniqid();
+        $this->mask_path = "";
     }
 
 	public function __toString() {
@@ -234,6 +242,25 @@ class File {
 
 
     /**
+     * Get mask_path
+     *
+     * @return string
+     */
+    public function getMaskPath() {
+        return $this->mask_path;
+    }
+
+    /**
+     * Set preview_path
+     *
+     * @param string $mask_path
+     */
+    public function setMaskPath($mask_path) {
+        $this->mask_path = $mask_path;
+    }
+
+
+    /**
      * @param \Symfony\Component\HttpFoundation\File\File $file
      */
     public function setFile(SymfonyFile $file) {
@@ -300,6 +327,13 @@ class File {
                     }
                 }
 
+                if ($this->mask_path != "") {
+                    if (extension_loaded('Imagick')) {
+                        $this->preview_format = "png";
+                        $this->preview_path = $this->path . '.' . $this->preview_format;
+                    }
+                }
+
             }
             else {
                 $this->name = $this->name != "" ? $this->name : "untitled";
@@ -353,6 +387,44 @@ class File {
 
                     $img_flat->clear();
                     $img_flat->destroy();
+                }
+            }
+
+            if ($this->mask_path != "") {
+                if (extension_loaded('Imagick')) {
+                    $img = new \Imagick($this->getAbsolutePath());
+                    $new = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
+                    $mask = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
+
+                    $width = $new->getImageWidth();
+                    $height = $new->getImageHeight();
+
+                    $img_width = $img->getImageWidth();
+                    $img_height = $img->getImageHeight();
+
+                    list($thumb_width, $thumb_height) = $this->fit(
+                        $img_width,
+                        $img_height,
+                        $width,
+                        $height,
+                        "out",
+                        true
+                    );
+
+                    $img->resizeImage($thumb_width, $thumb_height, \Imagick::FILTER_LANCZOS, 1);
+                    $img->cropImage($width, $height, ($thumb_width - $width) / 2, ($thumb_height - $height) / 2);
+
+                    $new->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+                    $mask->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+
+                    $new->compositeImage($img, \Imagick::COMPOSITE_DEFAULT, 0, 0);
+                    $new->compositeImage($mask, \Imagick::COMPOSITE_DSTIN, 0, 0, \Imagick::CHANNEL_ALPHA);
+
+                    $new->setImageFormat($this->extension);
+                    $new->writeImage($this->getAbsolutePreviewPath());
+
+                    $new->clear();
+                    $new->destroy();
                 }
             }
 
@@ -415,11 +487,11 @@ class File {
         if ($this->path === null) {
             return '/bundles/wbxfile/images/default.png';
         }
-        else if ($this->is_web_image) {
-            return '/' . $this->getUploadDir() . '/' . $this->path;
-        }
         else if ($this->preview_path !== null) {
             return '/' . $this->getUploadDir() . '/' . $this->preview_path;
+        }
+        else if ($this->is_web_image) {
+            return '/' . $this->getUploadDir() . '/' . $this->path;
         }
         else {
             return '/bundles/wbxfile/images/default.png';
@@ -454,5 +526,33 @@ class File {
 
         return $extension;
     }
+
+    protected function fit($w_in, $h_in, $w_box, $h_box, $mode = "in", $upscale = true) {
+    	$rw= $w_in / $w_box;
+    	$rh= $h_in / $h_box;
+    	$ri= $w_in / $h_in;
+
+        if (!$upscale && $rw < 1 && $rh < 1) {
+            $a = array($w_in, $h_in);
+        }
+        else {
+            if ($rw > $rh) {
+            	$a = $mode == "in" ?
+                    array($w_box, round($w_box / $ri)) :
+                    array(round($h_box * $ri), $h_box);
+            }
+            else if ($rw < $rh) {
+                $a = $mode == "in" ?
+                    array(round($h_box * $ri), $h_box) :
+                    array($w_box, round($w_box / $ri));
+            }
+            else {
+                $a = array($w_box, $h_box);
+            }
+        }
+
+        return $a;
+    }
+
 
 }
