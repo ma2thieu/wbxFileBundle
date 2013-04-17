@@ -108,6 +108,11 @@ class File {
      */
     public $preview_format = "jpg";
 
+    /**
+     * @var string $default_path
+     */
+    public $default_path = "/bundles/wbxfile/images/default.png";
+
 
     /**
      *  Constructor
@@ -249,6 +254,7 @@ class File {
     public function getMaskPath() {
         return $this->mask_path;
     }
+
 
     /**
      * Set preview_path
@@ -485,7 +491,7 @@ class File {
 
     public function getWebPath() {
         if ($this->path === null) {
-            return '/bundles/wbxfile/images/default.png';
+            return $this->default_path;
         }
         else if ($this->preview_path !== null) {
             return '/' . $this->getUploadDir() . '/' . $this->preview_path;
@@ -494,13 +500,13 @@ class File {
             return '/' . $this->getUploadDir() . '/' . $this->path;
         }
         else {
-            return '/bundles/wbxfile/images/default.png';
+            return $this->default_path;
         }
     }
 
     public function getDownloadPath() {
         if ($this->path === null) {
-            return '/bundles/wbxfile/images/default.png';
+            return $this->default_path;
         }
         else {
             return '/' . $this->getUploadDir() . '/' . $this->path;
@@ -553,6 +559,7 @@ class File {
 
         return $a;
     }
+
 
 
 }
