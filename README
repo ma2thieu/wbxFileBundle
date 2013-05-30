@@ -104,9 +104,10 @@ Form
 ----
 
 	$builder
-		->add('file', new \wbx\FileBundle\Form\FileType(true|false))
+		->add('file', new \wbx\FileBundle\Form\FileType($with_empty, $with_name))
 
-* Pass `true` or `false` to `FileType` constructor to display or not the "empty" checkbox to remove the uploaded file
+* $with_empty (true|false) : display or not the "empty" checkbox to remove the uploaded file
+* $with_name (true|false) : display or not the "name" field. Name default to the uploaded filename
 
 * If the php imagick extension is available it is used to create a png preview of uploaded pdf files. $file->getWebPath() will automatically return the preview file.
 

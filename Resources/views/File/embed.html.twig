@@ -3,7 +3,19 @@
 {{ form_row(form.is_file_changed) }}
 
 <div>
-    {{ form_row(form.name) }}
+    {# TODO : find a better way to check if "name" exists. {% if form.name is defined %} doesn't work because form.name returns the form name (not the field "name") #}
+    {% set name_exists = false %}
+    {% for k,v in form %}
+        {% if k == "name" %}
+            {% set name_exists = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if name_exists %}
+        {{ form_row(form.name) }}
+    {% else %}
+    {% endif %}
+
     {{ form_row(form.file) }}
 </div>
 
