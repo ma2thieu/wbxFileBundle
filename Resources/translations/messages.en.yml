@@ -1,0 +1,5 @@
+wbxfilebundle:
+  form:
+    file: File
+    name: Filename
+    empty: Empty

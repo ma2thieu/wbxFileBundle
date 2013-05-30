@@ -1,0 +1,5 @@
+wbxfilebundle:
+  form:
+    file: Fichier
+    name: Nom du fichier
+    empty: Effacer
