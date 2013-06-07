@@ -22,35 +22,35 @@ class File {
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string $name
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string $extension
      *
      * @ORM\Column(name="extension", type="string", length=255, nullable=true)
      */
-    private $extension;
+    protected $extension;
 
     /**
      * @var string $path
      *
      * @ORM\Column(name="path", type="string", length=255, nullable=true)
      */
-    private $path;
+    protected $path;
 
     /**
      * @var string $preview_path
      *
      * @ORM\Column(name="preview_path", type="string", length=255, nullable=true)
      */
-    private $preview_path;
+    protected $preview_path;
 
     /**
      * @var string $is_web_image
@@ -64,24 +64,24 @@ class File {
      *
      * @ORM\Column(name="is_file_changed", type="boolean", nullable=true)
      */
-    private $is_file_changed;
+    protected $is_file_changed;
 
     /**
      * @var string $mask_path
      *
      * @ORM\Column(name="mask_path", type="string", length=255, nullable=true)
      */
-    private $mask_path;
+    protected $mask_path;
 
     /**
      * @var string $old_path
      */
-    private $old_path;
+    protected $old_path;
 
     /**
      * @var string $old_preview_path
      */
-    private $old_preview_path;
+    protected $old_preview_path;
 
     /**
      * @var string $to_unlink
@@ -96,22 +96,22 @@ class File {
     /**
      * @var \Symfony\Component\HttpFoundation\File\File $file
      */
-    public $file;
+    protected $file;
 
     /**
      * @var string $to_empty
      */
-	public $to_empty;
+    protected $to_empty;
 
     /**
      * @var string $preview_format
      */
-    public $preview_format = "jpg";
+    protected $preview_format = "jpg";
 
     /**
      * @var string $default_path
      */
-    public $default_path = "/bundles/wbxfile/images/default.png";
+    protected $default_path = "/bundles/wbxfile/images/default.png";
 
 
     /**
