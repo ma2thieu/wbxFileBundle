@@ -20,12 +20,12 @@
 </div>
 
 <div class="media" style="padding-top:20px">
-    {% if form.get('value').path is defined and form.get('value').path is not null %}
-        <a href="{{ path('wbxFileBundle_download', { 'id': form.get('value').id, 'class': class }) }}">
+    {% if form.vars.value.path is defined and form.vars.value.path is not null %}
+        <a href="{{ path('wbxFileBundle_download', { 'id': form.vars.value.id, 'class': class }) }}">
             {% if imagine_filter is not defined or imagine_filter == "" %}
                 download
             {% else %}
-                <img src="{{ form.get('value').getWebPath() | imagine_filter(imagine_filter) }}" />
+                <img src="{{ form.vars.data.getWebPath() | imagine_filter(imagine_filter) }}" />
             {% endif %}
         </a>
     {% elseif show_default_image is defined and show_default_image %}
