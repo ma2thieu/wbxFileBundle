@@ -515,12 +515,17 @@ class File {
 
 
     protected function getUploadRootDir() {
-        return __DIR__ . '/../../../../../../web/' . $this->getUploadDir();
+        return __DIR__ . '/../../../../../../' . $this->getWebDir() . '/' . $this->getUploadDir();
     }
 
-    protected function getUploadDir() {
+    public function getWebDir() {
+        return 'web';
+    }
+
+    public function getUploadDir() {
         return 'uploads';
     }
+
 
     protected function extractFilenameExtension($filename) {
         $extension = "";
