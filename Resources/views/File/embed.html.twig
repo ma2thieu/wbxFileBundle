@@ -2,7 +2,19 @@
 
 {{ form_row(form.is_file_changed) }}
 
-<div>
+<div class="media">
+    {% if form.vars.value.path is defined and form.vars.value.path is not null %}
+        <a class="pull-left" href="{{ path('wbxFileBundle_download', { 'id': form.vars.value.id, 'class': class }) }}">
+            {% if imagine_filter is not defined or imagine_filter == "" %}
+                download
+            {% else %}
+                <img src="{{ form.vars.data.getWebPath() | imagine_filter(imagine_filter) }}" />
+            {% endif %}
+        </a>
+    {% elseif show_default_image is defined and show_default_image %}
+        <img class="pull-left" src="{{ "/bundles/wbxfile/images/default.png" | imagine_filter(imagine_filter) }}" />
+    {% endif %}
+
     {# TODO : find a better way to check if "name" exists. {% if form.name is defined %} doesn't work because form.name returns the form name (not the field "name") #}
     {% set name_exists = false %}
     {% for k,v in form %}
@@ -11,34 +23,18 @@
         {% endif %}
     {% endfor %}
 
-    {% if name_exists %}
-        {{ form_row(form.name) }}
-    {% else %}
-    {% endif %}
+    <div class="media-body">
+        {% if name_exists %}
+            {{ form_row(form.name) }}
+        {% else %}
+        {% endif %}
 
-    {{ form_row(form.file) }}
+        {{ form_row(form.file) }}
+    
+        {% if form.to_empty is defined %}
+            {{ form_row(form.to_empty) }}
+        {% endif %}
+
+        {{ form_rest(form) }}
+    </div>
 </div>
-
-<div class="media" style="padding-top:20px">
-    {% if form.vars.value.path is defined and form.vars.value.path is not null %}
-        <a href="{{ path('wbxFileBundle_download', { 'id': form.vars.value.id, 'class': class }) }}">
-            {% if imagine_filter is not defined or imagine_filter == "" %}
-                download
-            {% else %}
-                <img src="{{ form.vars.data.getWebPath() | imagine_filter(imagine_filter) }}" />
-            {% endif %}
-        </a>
-    {% elseif show_default_image is defined and show_default_image %}
-        <img src="{{ "/bundles/wbxfile/images/default.png" | imagine_filter(imagine_filter) }}" />
-    {% endif %}
-</div>
-
-<div class="clear"></div>
-
-<div>
-    {% if form.to_empty is defined %}
-        {{ form_row(form.to_empty) }}
-    {% endif %}
-</div>
-
-{{ form_rest(form) }}
