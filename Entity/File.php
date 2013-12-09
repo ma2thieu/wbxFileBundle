@@ -113,6 +113,11 @@ class File {
      */
     protected $default_path = "/bundles/wbxfile/images/default.png";
 
+    /*
+     * @var string $auto_rotate
+     */
+    protected $auto_rotate = true;
+
 
     /**
      *  Constructor
@@ -333,7 +338,13 @@ class File {
                     }
                 }
 
-                if ($this->mask_path != "") {
+                if ($this->is_web_image && $this->auto_rotate) {
+                    if (extension_loaded('Imagick')) {
+                        $this->preview_path = $this->path . '.' . $this->preview_format;
+                    }
+                }
+
+                if ($this->is_web_image && $this->mask_path != "") {
                     if (extension_loaded('Imagick')) {
                         $this->preview_format = "png";
                         $this->preview_path = $this->path . '.' . $this->preview_format;
@@ -396,7 +407,57 @@ class File {
                 }
             }
 
-            if ($this->mask_path != "") {
+            if ($this->is_web_image && $this->auto_rotate) {
+                if (extension_loaded('Imagick')) {
+                    $exif = exif_read_data($this->getAbsolutePath(), "IFD0", true);
+                    if ($exif !== false && isset($exif['IFD0']) && isset($exif['IFD0']['Orientation'])) {
+    
+                        $orientation = $exif['IFD0']['Orientation'];
+                        $orientation - intval($orientation);
+
+                        if ($orientation > 1 && $orientation < 9) {
+                            $img = new \Imagick($this->getAbsolutePath());
+
+                            if ($orientation == 2) {
+                                // flip horizontal
+                                $img->flopImage();
+                            }
+                            else if ($orientation == 3) {
+                                // rotate 180
+                                $img->rotateImage(new \ImagickPixel('#00000000'), 180);
+                            }
+                            else if ($orientation == 4) {
+                                // flip vertical
+                                $img->flipImage();
+                            }
+                            else if ($orientation == 5) {
+                                // flip vertical  + rotate 90
+                                $img->flipImage();
+                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                            }
+                            else if ($orientation == 6) {
+                                // rotate 90
+                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                            }
+                            else if ($orientation == 7) {
+                                // flip horizontal + rotate 90
+                                $img->flopImage();
+                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                            }
+                            else if ($orientation == 8) {
+                                // rotate -90
+                                $img->rotateImage(new \ImagickPixel('#00000000'), -90);
+                            }
+
+                            $img->writeImage($this->getAbsolutePreviewPath());
+                            $img->clear();
+                            $img->destroy();
+                        }
+                    }
+                }
+            }
+
+            if ($this->is_web_image && $this->mask_path != "") {
                 if (extension_loaded('Imagick')) {
                     $img = new \Imagick($this->getAbsolutePath());
                     $new = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
