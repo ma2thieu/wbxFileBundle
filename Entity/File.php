@@ -118,6 +118,11 @@ class File {
      */
     protected $auto_rotate = true;
 
+    /*
+     * @var string $pdf_preview_quality
+     */
+    protected $pdf_preview_quality = 3;
+
 
     /**
      *  Constructor
@@ -381,7 +386,7 @@ class File {
             if ($this->extension == "pdf") {
                 if (extension_loaded('Imagick')) {
                     $img = new \Imagick();
-                    $img->setResolution(3*72, 3*72);
+                    $img->setResolution($this->pdf_preview_quality * 72, $this->pdf_preview_quality * 72);
 
                     $img->readImage($this->getAbsolutePath() . '[0]');
                     $img->setbackgroundcolor("#ff0000");
