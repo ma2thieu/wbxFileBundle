@@ -428,7 +428,7 @@ class File {
 				$img_flat->destroy();
 			}
 
-			if ($_rotate_do) {
+			if ($this->_rotate_do) {
 				$img = new \Imagick($this->getAbsolutePath());
 
 				if ($orientation == 2) {
@@ -467,7 +467,7 @@ class File {
 				$img->destroy();
 			}
 
-			if ($_mask_do) {
+			if ($this->_mask_do) {
 				$img = new \Imagick($this->getAbsolutePath());
 				$new = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
 				$mask = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
