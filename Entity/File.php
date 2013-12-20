@@ -57,7 +57,7 @@ class File {
      *
      * @ORM\Column(name="is_web_image", type="boolean", nullable=true)
      */
-    private $is_web_image;
+    protected $is_web_image;
 
     /**
      * @var string $is_file_changed
@@ -122,6 +122,12 @@ class File {
      * @var string $pdf_preview_quality
      */
     protected $pdf_preview_quality = 3;
+
+
+    private $_pdf_do = false;
+    private $_mask_do = false;
+    private $_rotate_do = false;
+    private $_rotate_orientation = 0;
 
 
     /**
@@ -340,12 +346,23 @@ class File {
                 if ($this->extension == "pdf") {
                     if (extension_loaded('Imagick')) {
                         $this->preview_path = $this->path . '.' . $this->preview_format;
+                        $this->_pdf_do = true;
                     }
                 }
 
                 if ($this->is_web_image && $this->auto_rotate) {
                     if (extension_loaded('Imagick')) {
-                        $this->preview_path = $this->path . '.' . $this->preview_format;
+                        $exif = exif_read_data($this->file, "IFD0", true);
+                        if ($exif !== false && isset($exif['IFD0']) && isset($exif['IFD0']['Orientation'])) {
+                            $orientation = $exif['IFD0']['Orientation'];
+                            $orientation - intval($orientation);
+
+                            if ($orientation > 1 && $orientation < 9) {
+                                $this->preview_path = $this->path . '.' . $this->preview_format;
+                                $this->_rotate_orientation = $orientation;
+                                $this->_rotate_do = true;
+                            }
+                        }
                     }
                 }
 
@@ -353,6 +370,7 @@ class File {
                     if (extension_loaded('Imagick')) {
                         $this->preview_format = "png";
                         $this->preview_path = $this->path . '.' . $this->preview_format;
+                        $this->_mask_do = true;
                     }
                 }
 
@@ -383,121 +401,106 @@ class File {
             $this->file->move($this->getUploadRootDir(), $this->path);
 
 
-            if ($this->extension == "pdf") {
-                if (extension_loaded('Imagick')) {
-                    $img = new \Imagick();
-                    $img->setResolution($this->pdf_preview_quality * 72, $this->pdf_preview_quality * 72);
+            if ($this->_pdf_do) {
+                $img = new \Imagick();
+                $img->setResolution($this->pdf_preview_quality * 72, $this->pdf_preview_quality * 72);
 
-                    $img->readImage($this->getAbsolutePath() . '[0]');
-                    $img->setbackgroundcolor("#ff0000");
+                $img->readImage($this->getAbsolutePath() . '[0]');
+                $img->setbackgroundcolor("#ff0000");
 
-                    $img->resampleImage(72, 72, \imagick::FILTER_GAUSSIAN, 1);
-                    $img->setImageResolution(72, 72);
+                $img->resampleImage(72, 72, \imagick::FILTER_GAUSSIAN, 1);
+                $img->setImageResolution(72, 72);
 
-                    $img_flat = new \IMagick();
-                    $img_flat->newImage($img->getImageWidth(), $img->getImageHeight(), new \ImagickPixel("white"));
+                $img_flat = new \IMagick();
+                $img_flat->newImage($img->getImageWidth(), $img->getImageHeight(), new \ImagickPixel("white"));
 
-                    $img_flat->compositeImage($img, \imagick::COMPOSITE_OVER, 0, 0);
+                $img_flat->compositeImage($img, \imagick::COMPOSITE_OVER, 0, 0);
 
-                    $img_flat->setImageFormat($this->preview_format);
-                    $img_flat->writeImage('image.jpg');
-                    $img_flat->setCompressionQuality(90);
-                    $img_flat->writeImages($this->getAbsolutePreviewPath(), true);
+                $img_flat->setImageFormat($this->preview_format);
+                $img_flat->writeImage('image.jpg');
+                $img_flat->setCompressionQuality(90);
+                $img_flat->writeImages($this->getAbsolutePreviewPath(), true);
 
-                    $img->clear();
-                    $img->destroy();
+                $img->clear();
+                $img->destroy();
 
-                    $img_flat->clear();
-                    $img_flat->destroy();
-                }
+                $img_flat->clear();
+                $img_flat->destroy();
             }
 
-            if ($this->is_web_image && $this->auto_rotate) {
-                if (extension_loaded('Imagick')) {
-                    $exif = exif_read_data($this->getAbsolutePath(), "IFD0", true);
-                    if ($exif !== false && isset($exif['IFD0']) && isset($exif['IFD0']['Orientation'])) {
-    
-                        $orientation = $exif['IFD0']['Orientation'];
-                        $orientation - intval($orientation);
+            if ($_rotate_do) {
+                $img = new \Imagick($this->getAbsolutePath());
 
-                        if ($orientation > 1 && $orientation < 9) {
-                            $img = new \Imagick($this->getAbsolutePath());
-
-                            if ($orientation == 2) {
-                                // flip horizontal
-                                $img->flopImage();
-                            }
-                            else if ($orientation == 3) {
-                                // rotate 180
-                                $img->rotateImage(new \ImagickPixel('#00000000'), 180);
-                            }
-                            else if ($orientation == 4) {
-                                // flip vertical
-                                $img->flipImage();
-                            }
-                            else if ($orientation == 5) {
-                                // flip vertical  + rotate 90
-                                $img->flipImage();
-                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
-                            }
-                            else if ($orientation == 6) {
-                                // rotate 90
-                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
-                            }
-                            else if ($orientation == 7) {
-                                // flip horizontal + rotate 90
-                                $img->flopImage();
-                                $img->rotateImage(new \ImagickPixel('#00000000'), 90);
-                            }
-                            else if ($orientation == 8) {
-                                // rotate -90
-                                $img->rotateImage(new \ImagickPixel('#00000000'), -90);
-                            }
-
-                            $img->writeImage($this->getAbsolutePreviewPath());
-                            $img->clear();
-                            $img->destroy();
-                        }
-                    }
+                if ($orientation == 2) {
+                    // flip horizontal
+                    $img->flopImage();
                 }
+                else if ($orientation == 3) {
+                    // rotate 180
+                    $img->rotateImage(new \ImagickPixel('#00000000'), 180);
+                }
+                else if ($orientation == 4) {
+                    // flip vertical
+                    $img->flipImage();
+                }
+                else if ($orientation == 5) {
+                    // flip vertical  + rotate 90
+                    $img->flipImage();
+                    $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                }
+                else if ($orientation == 6) {
+                    // rotate 90
+                    $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                }
+                else if ($orientation == 7) {
+                    // flip horizontal + rotate 90
+                    $img->flopImage();
+                    $img->rotateImage(new \ImagickPixel('#00000000'), 90);
+                }
+                else if ($orientation == 8) {
+                    // rotate -90
+                    $img->rotateImage(new \ImagickPixel('#00000000'), -90);
+                }
+
+                $img->writeImage($this->getAbsolutePreviewPath());
+                $img->clear();
+                $img->destroy();
             }
 
-            if ($this->is_web_image && $this->mask_path != "") {
-                if (extension_loaded('Imagick')) {
-                    $img = new \Imagick($this->getAbsolutePath());
-                    $new = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
-                    $mask = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
+            if ($_mask_do) {
+                $img = new \Imagick($this->getAbsolutePath());
+                $new = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
+                $mask = new \Imagick($this->getUploadRootDir() . '/../' . $this->getMaskPath());
 
-                    $width = $new->getImageWidth();
-                    $height = $new->getImageHeight();
+                $width = $new->getImageWidth();
+                $height = $new->getImageHeight();
 
-                    $img_width = $img->getImageWidth();
-                    $img_height = $img->getImageHeight();
+                $img_width = $img->getImageWidth();
+                $img_height = $img->getImageHeight();
 
-                    list($thumb_width, $thumb_height) = $this->fit(
-                        $img_width,
-                        $img_height,
-                        $width,
-                        $height,
-                        "out",
-                        true
-                    );
+                list($thumb_width, $thumb_height) = $this->fit(
+                    $img_width,
+                    $img_height,
+                    $width,
+                    $height,
+                    "out",
+                    true
+                );
 
-                    $img->resizeImage($thumb_width, $thumb_height, \Imagick::FILTER_LANCZOS, 1);
-                    $img->cropImage($width, $height, ($thumb_width - $width) / 2, ($thumb_height - $height) / 2);
+                $img->resizeImage($thumb_width, $thumb_height, \Imagick::FILTER_LANCZOS, 1);
+                $img->cropImage($width, $height, ($thumb_width - $width) / 2, ($thumb_height - $height) / 2);
 
-                    $new->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
-                    $mask->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+                $new->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+                $mask->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
 
-                    $new->compositeImage($img, \Imagick::COMPOSITE_DEFAULT, 0, 0);
-                    $new->compositeImage($mask, \Imagick::COMPOSITE_DSTIN, 0, 0, \Imagick::CHANNEL_ALPHA);
+                $new->compositeImage($img, \Imagick::COMPOSITE_DEFAULT, 0, 0);
+                $new->compositeImage($mask, \Imagick::COMPOSITE_DSTIN, 0, 0, \Imagick::CHANNEL_ALPHA);
 
-                    $new->setImageFormat($this->extension);
-                    $new->writeImage($this->getAbsolutePreviewPath());
+                $new->setImageFormat($this->extension);
+                $new->writeImage($this->getAbsolutePreviewPath());
 
-                    $new->clear();
-                    $new->destroy();
-                }
+                $new->clear();
+                $new->destroy();
             }
 
 
