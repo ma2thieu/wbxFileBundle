@@ -352,7 +352,7 @@ class File {
 
 				if ($this->is_web_image && $this->auto_rotate) {
 					if (extension_loaded('Imagick')) {
-						$exif = exif_read_data($this->file, "IFD0", true);
+						$exif = @exif_read_data($this->file, "IFD0", true);
 						if ($exif !== false && isset($exif['IFD0']) && isset($exif['IFD0']['Orientation'])) {
 							$orientation = $exif['IFD0']['Orientation'];
 							$orientation - intval($orientation);
