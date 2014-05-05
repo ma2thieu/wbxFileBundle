@@ -608,31 +608,33 @@ class File {
 	}
 
 	protected function fit($w_in, $h_in, $w_box, $h_box, $mode = "in", $upscale = true) {
-		$rw= $w_in / $w_box;
-		$rh= $h_in / $h_box;
-		$ri= $w_in / $h_in;
+        $rw = $w_in / $w_box;
+        $rh = $h_in / $h_box;
+        $ri = $w_in / $h_in;
 
-		if (!$upscale && $rw < 1 && $rh < 1) {
-			$a = array($w_in, $h_in);
-		}
-		else {
-			if ($rw > $rh) {
-				$a = $mode == "in" ?
-					array($w_box, round($w_box / $ri)) :
-					array(round($h_box * $ri), $h_box);
-			}
-			else if ($rw < $rh) {
-				$a = $mode == "in" ?
-					array(round($h_box * $ri), $h_box) :
-					array($w_box, round($w_box / $ri));
-			}
-			else {
-				$a = array($w_box, $h_box);
-			}
-		}
+        if (!$upscale && $rw < 1 && $rh < 1) {
+            $a = array($w_in, $h_in);
+        }
+        else {
+            if ($rw > $rh) {
+                if ($mode == "in") {
+                    $a = array($w_box, round($w_box / $ri));
+                    $a = array(round($h_box * $ri), $h_box);
+                }
+            }
+            else if ($rw < $rh) {
+                if ($mode == "in") {
+                    $a = array(round($h_box * $ri), $h_box);
+                    $a = array($w_box, round($w_box / $ri));
+                }
+            }
+            else {
+                $a = array($w_box, $h_box);
+            }
+        }
 
-		return $a;
-	}
+        return $a;
+    }
 
 
 
