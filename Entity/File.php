@@ -619,12 +619,16 @@ class File {
             if ($rw > $rh) {
                 if ($mode == "in") {
                     $a = array($w_box, round($w_box / $ri));
+                }
+                else {
                     $a = array(round($h_box * $ri), $h_box);
                 }
             }
             else if ($rw < $rh) {
                 if ($mode == "in") {
                     $a = array(round($h_box * $ri), $h_box);
+                }
+                else {
                     $a = array($w_box, round($w_box / $ri));
                 }
             }
