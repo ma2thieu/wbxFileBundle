@@ -297,6 +297,11 @@ class File {
 	}
 
 
+	protected function generatePath() {
+        return uniqid();
+    }
+
+
 
 	/**
 	 * @ORM\PrePersist()
@@ -339,7 +344,7 @@ class File {
 
 				$this->name = $this->name != "" ? $this->name : $filename;
 
-				$this->path = uniqid() . '.' . $this->extension;
+				$this->path = $this->generatePath() . '.' . $this->extension;
 
 				$this->preview_path = null;
 
