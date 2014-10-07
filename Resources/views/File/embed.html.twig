@@ -32,7 +32,7 @@
         {{ form_row(form.file) }}
     
         {% if form.to_empty is defined %}
-            {{ form_row(form.to_empty) }}
+            {{ form_widget(form.to_empty) }}
         {% endif %}
 
         {{ form_rest(form) }}

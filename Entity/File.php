@@ -297,6 +297,15 @@ class File {
 	}
 
 
+	public function setToEmpty($to_empty) {
+		$this->to_empty = $to_empty;
+	}
+
+	public function getToEmpty() {
+		return $this->to_empty;
+	}
+
+
 	protected function generatePath() {
         return uniqid();
     }
