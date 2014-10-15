@@ -7,12 +7,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Symfony\Component\HttpFoundation\File\File AS SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 /**
  * wbx\FileBundle\Entity\File
  *
  * @Orm\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
+ * @Assert\Callback(methods={"isValid"})
  */
 class File {
 	/**
@@ -307,8 +309,8 @@ class File {
 
 
 	protected function generatePath() {
-        return uniqid();
-    }
+		return uniqid();
+	}
 
 
 
@@ -622,37 +624,44 @@ class File {
 	}
 
 	protected function fit($w_in, $h_in, $w_box, $h_box, $mode = "in", $upscale = true) {
-        $rw = $w_in / $w_box;
-        $rh = $h_in / $h_box;
-        $ri = $w_in / $h_in;
+		$rw = $w_in / $w_box;
+		$rh = $h_in / $h_box;
+		$ri = $w_in / $h_in;
 
-        if (!$upscale && $rw < 1 && $rh < 1) {
-            $a = array($w_in, $h_in);
-        }
-        else {
-            if ($rw > $rh) {
-                if ($mode == "in") {
-                    $a = array($w_box, round($w_box / $ri));
-                }
-                else {
-                    $a = array(round($h_box * $ri), $h_box);
-                }
-            }
-            else if ($rw < $rh) {
-                if ($mode == "in") {
-                    $a = array(round($h_box * $ri), $h_box);
-                }
-                else {
-                    $a = array($w_box, round($w_box / $ri));
-                }
-            }
-            else {
-                $a = array($w_box, $h_box);
-            }
-        }
+		if (!$upscale && $rw < 1 && $rh < 1) {
+			$a = array($w_in, $h_in);
+		}
+		else {
+			if ($rw > $rh) {
+				if ($mode == "in") {
+					$a = array($w_box, round($w_box / $ri));
+				}
+				else {
+					$a = array(round($h_box * $ri), $h_box);
+				}
+			}
+			else if ($rw < $rh) {
+				if ($mode == "in") {
+					$a = array(round($h_box * $ri), $h_box);
+				}
+				else {
+					$a = array($w_box, round($w_box / $ri));
+				}
+			}
+			else {
+				$a = array($w_box, $h_box);
+			}
+		}
 
-        return $a;
-    }
+		return $a;
+	}
+
+
+	public function isValid(ExecutionContextInterface $context) {
+		if ($this->file === null && $this->path === null) {
+			$context->addViolationAt('file', 'wbxfilebundle.validator.error.empty', array(), null);
+		}
+	}
 
 
 
