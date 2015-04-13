@@ -1,0 +1,38 @@
+<div class="thumbnail">
+    {% if form.vars.value.path is defined and form.vars.value.path is not null %}
+        {% if imagine_filter is not defined or imagine_filter == "" %}
+            download
+        {% else %}
+            <img src="{{ form.vars.data.getWebPath() | imagine_filter(imagine_filter) }}" />
+        {% endif %}
+    {% elseif show_default_image is defined and show_default_image %}
+        <img class="pull-left" src="{{ "/bundles/wbxfile/images/default.png" | imagine_filter(imagine_filter) }}" />
+    {% endif %}
+
+    {# TODO : find a better way to check if "name" exists. {% if form.name is defined %} doesn't work because form.name returns the form name (not the field "name") #}
+    {% set name_exists = false %}
+    {% for k,v in form %}
+        {% if k == "name" %}
+            {% set name_exists = true %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="caption">
+        {{ form_errors(form) }}
+
+        {{ form_row(form.is_file_changed) }}
+        
+        {% if name_exists %}
+            {{ form_row(form.name) }}
+        {% else %}
+        {% endif %}
+
+        {{ form_row(form.file) }}
+    
+        {% if form.to_empty is defined %}
+            {{ form_widget(form.to_empty) }}
+        {% endif %}
+
+        {{ form_rest(form) }}
+    </div>
+</div>
