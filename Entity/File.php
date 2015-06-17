@@ -579,10 +579,10 @@ class File {
 			return $this->default_path;
 		}
 		else if ($this->preview_path !== null) {
-			return '/' . $this->getUploadDir() . '/' . $this->preview_path;
+			return '/' . $this->getUploadDirs() . '/' . $this->preview_path;
 		}
 		else if ($this->is_web_image) {
-			return '/' . $this->getUploadDir() . '/' . $this->path;
+			return '/' . $this->getUploadDirs() . '/' . $this->path;
 		}
 		else {
 			return $this->default_path;
@@ -594,13 +594,13 @@ class File {
 			return $this->default_path;
 		}
 		else {
-			return '/' . $this->getUploadDir() . '/' . $this->path;
+			return '/' . $this->getUploadDirs() . '/' . $this->path;
 		}
 	}
 
 
 	protected function getUploadRootDir() {
-		return __DIR__ . '/../../../../../../' . $this->getWebDir() . '/' . $this->getUploadDir();
+		return __DIR__ . '/../../../../../../' . $this->getWebDir() . '/' . $this->getUploadDirs();
 	}
 
 	public function getWebDir() {
@@ -611,6 +611,28 @@ class File {
 		return 'uploads';
 	}
 
+	public function getUploadDirs() {
+		return $this->getUploadDir() . $this->getSubDirs();
+	}
+
+	protected function getSubDirs() {
+		$n = $this->getNbSubDirs();
+		$p = $this->getPath();
+		$d = "";
+
+		if ($n > 0) {
+			for ($i = 0; $i < $n; $i++) {
+				$d .= "/";
+				$d .= substr($p, $i, 1);
+			}
+		}
+
+		return $d;
+	}
+
+	public function getNbSubDirs() {
+		return 0;
+	}
 
 	protected function extractFilenameExtension($filename) {
 		$extension = "";
