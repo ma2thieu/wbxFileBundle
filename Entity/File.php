@@ -447,33 +447,33 @@ class File {
 			if ($this->_rotate_do) {
 				$img = new \Imagick($this->getAbsolutePath());
 
-				if ($orientation == 2) {
+				if ($this->_rotate_orientation == 2) {
 					// flip horizontal
 					$img->flopImage();
 				}
-				else if ($orientation == 3) {
+				else if ($this->_rotate_orientation == 3) {
 					// rotate 180
 					$img->rotateImage(new \ImagickPixel('#00000000'), 180);
 				}
-				else if ($orientation == 4) {
+				else if ($this->_rotate_orientation == 4) {
 					// flip vertical
 					$img->flipImage();
 				}
-				else if ($orientation == 5) {
+				else if ($this->_rotate_orientation == 5) {
 					// flip vertical  + rotate 90
 					$img->flipImage();
 					$img->rotateImage(new \ImagickPixel('#00000000'), 90);
 				}
-				else if ($orientation == 6) {
+				else if ($this->_rotate_orientation == 6) {
 					// rotate 90
 					$img->rotateImage(new \ImagickPixel('#00000000'), 90);
 				}
-				else if ($orientation == 7) {
+				else if ($this->_rotate_orientation == 7) {
 					// flip horizontal + rotate 90
 					$img->flopImage();
 					$img->rotateImage(new \ImagickPixel('#00000000'), 90);
 				}
-				else if ($orientation == 8) {
+				else if ($this->_rotate_orientation == 8) {
 					// rotate -90
 					$img->rotateImage(new \ImagickPixel('#00000000'), -90);
 				}
