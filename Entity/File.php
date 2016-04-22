@@ -359,7 +359,7 @@ class File {
 
 				$this->preview_path = null;
 
-				if ($this->extension == "pdf") {
+				if (strtolower($this->extension) == "pdf") {
 					if (extension_loaded('Imagick')) {
 						$this->preview_path = $this->path . '.' . $this->preview_format;
 						$this->_pdf_do = true;
