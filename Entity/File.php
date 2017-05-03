@@ -149,12 +149,12 @@ class File {
 	/*
 	 * @var string $video_ffmpeg_path
 	 */
-	public $video_ffmpeg_path = "";
+	public $video_ffmpeg_path = null;
 
 	/*
 	 * @var string $video_ffprobe_path
 	 */
-	public $video_ffprobe_path = "";
+	public $video_ffprobe_path = null;
 
 
 	private $_pdf_do = false;
