@@ -62,6 +62,13 @@ class File {
 	protected $is_web_image;
 
 	/**
+	 * @var string $is_web_video
+	 *
+	 * @ORM\Column(name="is_web_video", type="boolean", nullable=true)
+	 */
+	protected $is_web_video;
+
+	/**
 	 * @var string $is_file_changed
 	 *
 	 * @ORM\Column(name="is_file_changed", type="boolean", nullable=true)
@@ -73,7 +80,21 @@ class File {
 	 *
 	 * @ORM\Column(name="mask_path", type="string", length=255, nullable=true)
 	 */
-	protected $mask_path;
+	protected $mask_path = "";
+
+	/**
+	 * @var string $video_duration
+	 *
+	 * @ORM\Column(name="video_duration", type="float")
+	 */
+	protected $video_duration = 0;
+
+	/**
+	 * @var string $video_preview_second
+	 *
+	 * @ORM\Column(name="video_preview_second", type="integer")
+	 */
+	protected $video_preview_second = 1;
 
 	/**
 	 * @var string $old_path
@@ -125,11 +146,23 @@ class File {
 	 */
 	protected $pdf_preview_quality = 3;
 
+	/*
+	 * @var string $video_ffmpeg_path
+	 */
+	public $video_ffmpeg_path = "";
+
+	/*
+	 * @var string $video_ffprobe_path
+	 */
+	public $video_ffprobe_path = "";
+
 
 	private $_pdf_do = false;
 	private $_mask_do = false;
 	private $_rotate_do = false;
 	private $_rotate_orientation = 0;
+	private $_video_preview_do = false;
+	private $_video_duration_do = false;
 
 
 	/**
@@ -226,6 +259,7 @@ class File {
 		return $this->preview_path;
 	}
 
+
 	/**
 	 * Set $is_web_image
 	 *
@@ -243,6 +277,26 @@ class File {
 	public function getIsWebImage() {
 		return $this->is_web_image;
 	}
+
+
+	/**
+	 * Set $is_web_video
+	 *
+	 * @param boolean $is_web_video
+	 */
+	public function setIsWebVideo($is_web_video) {
+		$this->is_web_video = $is_web_video;
+	}
+
+	/**
+	 * Get $is_web_video
+	 *
+	 * @return boolean
+	 */
+	public function getIsWebVideo() {
+		return $this->is_web_video;
+	}
+
 
 	/**
 	 * Set $is_file_changed
@@ -273,14 +327,51 @@ class File {
 		return $this->mask_path;
 	}
 
-
 	/**
-	 * Set preview_path
+	 * Set mask_path
 	 *
 	 * @param string $mask_path
 	 */
 	public function setMaskPath($mask_path) {
 		$this->mask_path = $mask_path;
+	}
+
+
+	/**
+	 * Get video_duration
+	 *
+	 * @return integer
+	 */
+	public function getVideoDuration() {
+		return $this->video_duration;
+	}
+
+	/**
+	 * Set video_duration
+	 *
+	 * @param integer $video_duration
+	 */
+	public function setVideoDuration($video_duration) {
+		$this->video_duration = $video_duration;
+	}
+
+
+	/**
+	 * Get video_preview_second
+	 *
+	 * @return integer
+	 */
+	public function getVideoPreviewSecond() {
+		return $this->video_preview_second;
+	}
+
+	/**
+	 * Set video_preview_second
+	 *
+	 * @param integer $video_preview_second
+	 */
+	public function setVideoPreviewSecond($video_preview_second) {
+		$this->video_preview_second = $video_preview_second;
 	}
 
 
@@ -313,6 +404,7 @@ class File {
 	}
 
 
+	// TODO : use a service for preUpload and upload (like https://github.com/dustin10/VichGeographicalBundle)
 
 	/**
 	 * @ORM\PrePersist()
@@ -342,10 +434,12 @@ class File {
 				if ($this->file instanceof UploadedFile) {
 					$filename = $this->file->getClientOriginalName();
 					$this->is_web_image = in_array($this->file->getMimeType(), array('image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png', 'image/gif'));
+					$this->is_web_video = in_array($this->file->getMimeType(), array('video/webm', 'video/ogg', 'video/mp4'));
 				}
 				else {
 					$filename = $this->file->getFileName();
 					$this->is_web_image = in_array($this->file->getExtension(), array('jpeg', 'jpg', 'png', 'gif'));
+					$this->is_web_video = in_array($this->file->getExtension(), array('webm', 'ogg', 'ogv', 'mp4', 'm4v'));
 				}
 
 				$this->extension = $this->extractFilenameExtension($filename);
@@ -388,6 +482,26 @@ class File {
 						$this->preview_path = $this->path . '.' . $this->preview_format;
 						$this->_mask_do = true;
 					}
+				}
+
+				if ($this->is_web_video && $this->video_ffprobe_path !== null) {
+					$ffprobe = \FFMpeg\FFProbe::create(array(
+					    'ffmpeg.binaries'  => $this->video_ffmpeg_path,
+					    'ffprobe.binaries' => $this->video_ffprobe_path,
+					    'timeout'          => 30,
+					    'ffmpeg.threads'   => 1,
+					), null);
+
+					$duration = $ffprobe
+					    ->format($this->file)
+					    ->get('duration');
+
+					$this->setVideoDuration($duration);
+				}
+
+				if ($this->is_web_video && $this->video_ffmpeg_path !== null && $this->video_ffprobe_path !== null) {
+					$this->preview_path = $this->path . '.' . $this->video_preview_second . '.' . $this->preview_format;
+					$this->_video_preview_do = true;
 				}
 
 			}
@@ -519,6 +633,10 @@ class File {
 				$new->destroy();
 			}
 
+			if ($this->_video_preview_do) {
+				$this->videoGeneratePreview();
+			}
+
 
 			unset($this->file);
 		}
@@ -544,6 +662,24 @@ class File {
 
 		if ($this->to_unlink_preview && is_file($this->to_unlink_preview)) {
 			unlink($this->to_unlink_preview);
+		}
+	}
+
+
+	public function videoGeneratePreview() {
+		if ($this->is_web_video && $this->video_ffmpeg_path !== null && $this->video_ffprobe_path !== null) {
+			$ffmpeg = \FFMpeg\FFMpeg::create(array(
+			    'ffmpeg.binaries'  => $this->video_ffmpeg_path,
+			    'ffprobe.binaries' => $this->video_ffprobe_path,
+			    'timeout'          => 30,
+			    'ffmpeg.threads'   => 1,
+			), null);
+
+			$this->setPreviewPath($this->path . '.' . $this->getVideoPreviewSecond() . '.' . $this->preview_format);
+
+			$video = $ffmpeg->open($this->getAbsolutePath());
+			$frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds($this->getVideoPreviewSecond()));
+			$frame->save($this->getAbsolutePreviewPath());
 		}
 	}
 
