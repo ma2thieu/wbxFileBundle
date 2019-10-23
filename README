@@ -55,15 +55,6 @@ Add wbxFileBundle to your application kernel
     }
 
 
-Configuration
-=============
-
-	# app/config/routing.yml :
-	wbxFileBundle_download:
-		pattern:  /wbxfile/download/{class}/{id}
-		defaults: { _controller: wbxFileBundle:File:download }
-
-
 Usage example
 =============
 
