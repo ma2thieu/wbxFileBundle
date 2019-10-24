@@ -7,14 +7,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Symfony\Component\HttpFoundation\File\File AS SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * wbx\FileBundle\Entity\File
  *
  * @Orm\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
- * @Assert\Callback(methods={"isValid"})
  */
 class File {
 	/**
@@ -815,9 +814,14 @@ class File {
 	}
 
 
+	/**
+     * @Assert\Callback
+     */
 	public function isValid(ExecutionContextInterface $context) {
 		if ($this->file === null && $this->path === null) {
-			$context->addViolationAt('file', 'wbxfilebundle.validator.error.empty', array(), null);
+			$context->buildViolation('wbxfilebundle.validator.error.empty')
+                ->atPath('file')
+                ->addViolation();
 		}
 	}
 
